@@ -1,7 +1,8 @@
+use std::io;
 use std::path::PathBuf;
 use std::process::{Command, Stdio};
 
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Result};
 use serde::Deserialize;
 
 use crate::config::AppContext;
@@ -26,7 +27,7 @@ impl SearchService {
             .arg(".")
             .current_dir(&self.root)
             .status()
-            .with_context(|| "failed to execute ripgrep")?;
+            .map_err(|err| map_exec_error(err, "rg"))?;
         if !status.success() {
             anyhow::bail!("ripgrep exited with {}", status);
         }
@@ -39,7 +40,7 @@ impl SearchService {
             .current_dir(&self.root)
             .stdout(Stdio::piped())
             .spawn()
-            .with_context(|| "failed to spawn ripgrep --files")?;
+            .map_err(|err| map_exec_error(err, "rg"))?;
 
         let mut fzf = Command::new("fzf")
             .arg("--ansi")
@@ -51,7 +52,7 @@ impl SearchService {
                     .ok_or_else(|| anyhow::anyhow!("failed to capture ripgrep stdout"))?,
             )
             .spawn()
-            .with_context(|| "failed to start fzf")?;
+            .map_err(|err| map_exec_error(err, "fzf"))?;
 
         let status_fzf = fzf.wait()?;
         let status_rg = rg.wait()?;
@@ -77,7 +78,7 @@ impl SearchService {
             .arg(".")
             .current_dir(&self.root)
             .output()
-            .with_context(|| "failed to execute ripgrep")?;
+            .map_err(|err| map_exec_error(err, "rg"))?;
         let success = output.status.success();
         let code = output.status.code();
         if !success && code != Some(1) {
@@ -154,4 +155,17 @@ struct RgMatch {
     path: String,
     line: String,
     line_number: usize,
+}
+
+fn map_exec_error(err: io::Error, tool: &str) -> anyhow::Error {
+    if err.kind() == io::ErrorKind::NotFound {
+        anyhow!(
+            r#"`{tool}` was not found in PATH. Please install it before using `obsctl search`. For example:
+  • macOS (Homebrew): brew install {tool}
+  • Ubuntu/Debian:   sudo apt-get install {tool}
+  • Arch Linux:      sudo pacman -S {tool}"#
+        )
+    } else {
+        anyhow::Error::new(err).context(format!("failed to execute {tool}"))
+    }
 }

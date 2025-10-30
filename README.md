@@ -16,6 +16,23 @@ cargo run -- task add "Review design doc" --due 2025-01-05 --priority high
 cargo run -- search grep "control loop"
 ```
 
+A few commands rely on external tools:
+
+- `rg` (ripgrep) for search (`brew install ripgrep` or `sudo apt install ripgrep`)
+- `fzf` for fuzzy finding (`brew install fzf` or `sudo apt install fzf`)
+
+## Install
+
+Fetch the latest release directly from GitHub:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/yumeminami/obsctl/master/scripts/install.sh | sh
+```
+
+Set `OBSCTL_INSTALL_DIR` to place the binaries somewhere else; by default they land in `~/.local/bin`.
+The installer selects the proper archive for macOS or Linux (x86-64 / ARM64) and installs both
+`obsctl` and the companion `obsctl_mcp` server.
+
 To persist configuration, run:
 
 ```bash
@@ -50,7 +67,7 @@ Run `cargo run -- --help` for global options and per-command usage.
 
 ## MCP Server
 
-- Start the server with `cargo run --bin mcp_server`.
+- Start the server with `cargo run --bin obsctl_mcp`.
 - Exposes tools: `append_daily_note`, `update_task_status`, `query_knowledge`, `summarize_today`.
 - Implements the Model Context Protocol using the official `rmcp` Rust SDK over stdio.
 - Designed for local LLMs/agents that speak MCP to automate notebook updates.

@@ -82,16 +82,17 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu
-      - name: Build release binary
-        run: cargo build --release --target ${{ matrix.target }} --bin obsctl
+      - name: Build release binaries
+        run: cargo build --release --target ${{ matrix.target }} --bin obsctl --bin obsctl_mcp
         env:
           CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER: aarch64-linux-gnu-gcc
       - name: Prepare archive
         run: |
           mkdir -p dist
           cp target/${{ matrix.target }}/release/obsctl dist/
+          cp target/${{ matrix.target }}/release/obsctl_mcp dist/
           cd dist
-          tar czf obsctl-${{ github.ref_name }}-${{ matrix.artifact_suffix }}.tar.gz obsctl
+          tar czf obsctl-${{ github.ref_name }}-${{ matrix.artifact_suffix }}.tar.gz obsctl obsctl_mcp
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:

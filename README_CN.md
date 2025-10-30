@@ -16,6 +16,23 @@ cargo run -- task add "整理项目周报" --due 2025-01-05 --priority high
 cargo run -- search grep "torque mapping"
 ```
 
+部分命令依赖外部工具，请先确保已安装：
+
+- `rg`（ripgrep，用于全文搜索）：macOS `brew install ripgrep`，Ubuntu `sudo apt install ripgrep`
+- `fzf`（模糊查找）：macOS `brew install fzf`，Ubuntu `sudo apt install fzf`
+
+## 安装方式
+
+可直接通过 GitHub 获取最新发行版：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/yumeminami/obsctl/master/scripts/install.sh | sh
+```
+
+如果需要指定安装目录，可预先设置 `OBSCTL_INSTALL_DIR`（默认安装至 `~/.local/bin`）。
+脚本会根据当前系统自动选择 macOS / Linux 以及 x86-64 / ARM64 的对应压缩包，并同时安装
+`obsctl` 与配套的 `obsctl_mcp` 服务端可执行文件。
+
 首次运行建议执行：
 
 ```bash
@@ -50,7 +67,7 @@ cargo run -- config init
 
 ## MCP 服务
 
-- 运行 `cargo run --bin mcp_server` 启动基于 stdio 的 MCP Server。
+- 运行 `cargo run --bin obsctl_mcp` 启动基于 stdio 的 MCP Server。
 - 提供工具：`append_daily_note`、`update_task_status`、`query_knowledge`、`summarize_today`。
 - 基于官方 `rmcp` Rust SDK，实现与本地 LLM/Agent 的 MCP 协议通信。
 - 可让 AI 自动补充每日笔记、更新任务状态、执行知识检索。
