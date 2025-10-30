@@ -138,52 +138,51 @@ impl ServerHandler for ObsctlMcpServer {
         }
     }
 
-    fn call_tool(
+    async fn call_tool(
         &self,
         request: CallToolRequestParam,
         _context: rmcp::service::RequestContext<rmcp::service::RoleServer>,
-    ) -> impl std::future::Future<Output = Result<CallToolResult, McpError>> + Send + '_ {
-        async move {
-            match request.name.as_ref() {
-                "append_daily_note" => {
-                    let params: AppendDailyNoteParams =
-                        parse_json_object(request.arguments.unwrap_or_default())?;
-                    let message = self
-                        .append_daily(&params.entry)
-                        .map_err(|err| internal_error("append daily note", err))?;
-                    Ok(CallToolResult::success(vec![Content::text(message)]))
-                }
-                "update_task_status" => {
-                    let params: UpdateTaskStatusParams =
-                        parse_json_object(request.arguments.unwrap_or_default())?;
-                    let message = self.update_task_status(params)?;
-                    Ok(CallToolResult::success(vec![Content::text(message)]))
-                }
-                "query_knowledge" => {
-                    let params: QueryKnowledgeParams =
-                        parse_json_object(request.arguments.unwrap_or_default())?;
-                    let body = self.query_knowledge(params)?;
-                    Ok(CallToolResult::success(vec![Content::text(body)]))
-                }
-                "summarize_today" => {
-                    let params: SummarizeTodayParams =
-                        parse_json_object(request.arguments.unwrap_or_default())?;
-                    if let Some(scope) = params.scope {
-                        if scope.to_lowercase() != "today" {
-                            return Err(McpError::invalid_params(
-                                "scope must be \"today\"",
-                                Some(json!({ "scope": scope })),
-                            ));
-                        }
-                    }
-                    let summary = self.summarize_today()?;
-                    Ok(CallToolResult::success(vec![Content::text(summary)]))
-                }
-                other => Err(McpError::invalid_params(
-                    format!("unknown tool: {other}"),
-                    Some(json!({ "tool": other })),
-                )),
+    ) -> Result<CallToolResult, McpError> {
+        let CallToolRequestParam { name, arguments } = request;
+        match name.as_ref() {
+            "append_daily_note" => {
+                let params: AppendDailyNoteParams =
+                    parse_json_object(arguments.clone().unwrap_or_default())?;
+                let message = self
+                    .append_daily(&params.entry)
+                    .map_err(|err| internal_error("append daily note", err))?;
+                Ok(CallToolResult::success(vec![Content::text(message)]))
             }
+            "update_task_status" => {
+                let params: UpdateTaskStatusParams =
+                    parse_json_object(arguments.clone().unwrap_or_default())?;
+                let message = self.update_task_status(params)?;
+                Ok(CallToolResult::success(vec![Content::text(message)]))
+            }
+            "query_knowledge" => {
+                let params: QueryKnowledgeParams =
+                    parse_json_object(arguments.clone().unwrap_or_default())?;
+                let body = self.query_knowledge(params)?;
+                Ok(CallToolResult::success(vec![Content::text(body)]))
+            }
+            "summarize_today" => {
+                let params: SummarizeTodayParams =
+                    parse_json_object(arguments.unwrap_or_default())?;
+                if let Some(scope) = params.scope {
+                    if scope.to_lowercase() != "today" {
+                        return Err(McpError::invalid_params(
+                            "scope must be \"today\"",
+                            Some(json!({ "scope": scope })),
+                        ));
+                    }
+                }
+                let summary = self.summarize_today()?;
+                Ok(CallToolResult::success(vec![Content::text(summary)]))
+            }
+            other => Err(McpError::invalid_params(
+                format!("unknown tool: {other}"),
+                Some(json!({ "tool": other })),
+            )),
         }
     }
 

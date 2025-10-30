@@ -78,4 +78,6 @@ cargo fmt
 cargo test
 ```
 
+- Optional: `pre-commit install` to enable `cargo fmt`/`cargo clippy` hooks from `.pre-commit-config.yaml`.
+
 Future milestones include MCP client integration, richer indexing (e.g., tantivy/sqlite FTS), and RAG-powered context retrieval.

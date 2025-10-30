@@ -78,4 +78,6 @@ cargo fmt
 cargo test
 ```
 
+- 若使用 pre-commit，可运行 `pre-commit install` 启用 `.pre-commit-config.yaml` 中的 `cargo fmt`/`cargo clippy` 钩子。
+
 后续规划包括：接入真实 MCP 客户端、构建向量/RAG 索引、以及更丰富的 AI 协作能力。

@@ -210,7 +210,8 @@ impl TaskRecord {
         }
         let done_char = trimmed.chars().nth(3)?;
         let done = matches!(done_char, 'x' | 'X');
-        let after_bracket = trimmed.splitn(2, ']').nth(1)?.trim();
+        let (_, after_raw) = trimmed.split_once(']')?;
+        let after_bracket = after_raw.trim();
         if !after_bracket.starts_with('(') {
             return None;
         }
