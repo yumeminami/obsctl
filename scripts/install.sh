@@ -32,21 +32,31 @@ case "$OS" in
     echo "error: unsupported operating system: $OS" >&2
     exit 1
     ;;
-esac
+    esac
 
 API_URL="https://api.github.com/repos/$REPO/releases/latest"
-RELEASE_JSON=$(curl -fsSL "$API_URL") || {
+RELEASE_JSON=$(curl -fsSL -H "Accept: application/vnd.github+json" -H "User-Agent: obsctl-installer" "$API_URL") || {
   echo "error: failed to query latest release metadata" >&2
   exit 1
 }
 
-TAG=$(printf '%s' "$RELEASE_JSON" | sed -n 's/.*"tag_name" *: *"\([^"]*\)".*/\1/p' | head -n1)
+if [ -z "$RELEASE_JSON" ]; then
+  echo "error: GitHub release metadata response was empty" >&2
+  exit 1
+fi
+
+TAG=$(printf '%s\n' "$RELEASE_JSON" | grep -m1 '"tag_name"' | sed 's/.*"tag_name"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/')
 if [ -z "$TAG" ]; then
   echo "error: unable to determine latest tag" >&2
   exit 1
 fi
 
-ASSET_URL=$(printf '%s' "$RELEASE_JSON" | sed -n "s/.*\(https:\\/\\/github.com\\/$REPO\\/releases\\/download\\/$TAG\\/obsctl-$TAG-$SUFFIX.tar.gz\).*/\1/p" | head -n1)
+ASSET_NAME="obsctl-$TAG-$SUFFIX.tar.gz"
+ASSET_URL=$(printf '%s' "$RELEASE_JSON" |
+  grep -o '"browser_download_url":"[^"]*"' |
+  grep "$ASSET_NAME" |
+  sed 's/"browser_download_url":"//' |
+  sed 's/"$//')
 
 if [ -z "$ASSET_URL" ]; then
   echo "error: no release asset found for suffix $SUFFIX" >&2
@@ -55,6 +65,8 @@ fi
 
 TMPDIR=$(mktemp -d)
 TARBALL="$TMPDIR/package.tar.gz"
+
+trap 'rm -rf "$TMPDIR"' EXIT INT TERM
 
 echo "Downloading obsctl $TAG ($SUFFIX)..."
 curl -fsSL "$ASSET_URL" -o "$TARBALL"
@@ -69,5 +81,3 @@ install "$TMPDIR/obsctl_mcp" "$INSTALL_ROOT/obsctl_mcp"
 echo "Installed to $INSTALL_ROOT"
 echo "Add the following to your shell profile if necessary:"
 echo "  export PATH=\"$INSTALL_ROOT:\$PATH\""
-
-rm -rf "$TMPDIR"
