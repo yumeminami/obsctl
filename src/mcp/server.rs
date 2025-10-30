@@ -258,18 +258,22 @@ fn update_task_tool() -> Tool {
     let schema = json!({
         "type": "object",
         "properties": {
-            "id": { "type": "integer", "minimum": 1 },
-            "title": { "type": "string" },
+            "id": {
+                "type": "integer",
+                "minimum": 1,
+                "description": "Task ID (provide either id or title)"
+            },
+            "title": {
+                "type": "string",
+                "description": "Task title (provide either id or title)"
+            },
             "status": {
                 "type": "string",
-                "enum": ["done", "completed", "complete", "open", "todo", "pending"]
+                "enum": ["done", "completed", "complete", "open", "todo", "pending"],
+                "description": "New status for the task"
             }
         },
-        "required": ["status"],
-        "anyOf": [
-            { "required": ["id"] },
-            { "required": ["title"] }
-        ]
+        "required": ["status"]
     });
     Tool::new(
         "update_task_status",

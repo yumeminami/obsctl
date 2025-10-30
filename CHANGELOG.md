@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 _No unreleased changes yet._
 
+## [0.1.3] - 2025-10-30
+
+### Fixed
+- MCP server schema compatibility with Anthropic API by removing unsupported `anyOf` constraint from `update_task_status` tool. The constraint has been replaced with descriptive text in parameter descriptions.
+
 ## [0.1.2] - 2025-02-19
 
 ### Added
