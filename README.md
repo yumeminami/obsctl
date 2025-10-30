@@ -44,6 +44,7 @@ Adjust paths in `config.toml` or use `cargo run -- config path --set <dir>` to r
 - `task add|done|list|clean` – maintain Markdown tasks with optional due date, recurrence, and priority markers.
 - `search grep|fzf` – grep the vault or fuzzy-find file paths.
 - `config init|path` – scaffold and inspect configuration.
+- `version [--json|--verbose]` – show release information in plain text or JSON output.
 
 Run `cargo run -- --help` for global options and per-command usage.
 
@@ -53,6 +54,10 @@ Run `cargo run -- --help` for global options and per-command usage.
 - Exposes tools: `append_daily_note`, `update_task_status`, `query_knowledge`, `summarize_today`.
 - Implements the Model Context Protocol using the official `rmcp` Rust SDK over stdio.
 - Designed for local LLMs/agents that speak MCP to automate notebook updates.
+
+## Changelog
+
+See [`CHANGELOG.md`](CHANGELOG.md) for release history.
 
 ## Architecture Overview
 

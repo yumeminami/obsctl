@@ -44,6 +44,7 @@ cargo run -- config init
 - `task add|done|list|clean`：新增、完成、筛选、清理任务，支持 Due / 🔁 / 优先级标记。
 - `search grep|fzf`：利用 ripgrep 全文搜索或 fzf 文件模糊查找。
 - `config init|path`：初始化配置，查看或更新 Vault 路径。
+- `version [--json|--verbose]`：输出当前版本信息，支持 JSON 与详细模式。
 
 更多参数说明可执行 `cargo run -- --help` 查看。
 
@@ -53,6 +54,10 @@ cargo run -- config init
 - 提供工具：`append_daily_note`、`update_task_status`、`query_knowledge`、`summarize_today`。
 - 基于官方 `rmcp` Rust SDK，实现与本地 LLM/Agent 的 MCP 协议通信。
 - 可让 AI 自动补充每日笔记、更新任务状态、执行知识检索。
+
+## 更新日志
+
+查看 [`CHANGELOG.md`](CHANGELOG.md) 了解版本变更记录。
 
 ## 代码结构
 
