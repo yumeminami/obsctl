@@ -1,0 +1,10 @@
+[vault]
+path = "/Users/you/.obsctl/vault"
+
+[templates]
+daily = "templates/daily.md"
+task = "templates/task.md"
+
+[search]
+tool = "ripgrep"
+fzf_preview = true
